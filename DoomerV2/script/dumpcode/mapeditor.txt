@@ -1,0 +1,290 @@
+#!/usr/bin/env python3
+import pygame
+import math
+import numpy as np
+from time   import time
+from script.mapeditor.wall import Wall
+from script.mapeditor.item import Item
+from script.general.button import Button
+from script.general.toggle import ToggleMenu
+from script.general.text import Text
+from script.general.textfield import TextField
+from SETTINGS import SETTINGS
+import script.general.loader as ld
+
+class MapEditor(object):
+    def __init__(self, selectedmap=""):
+        self.__WIDTH, self.__HEIGHT = SETTINGS.SIZE
+        self.__value_dict = SETTINGS.MAPITEMS
+        self.__FPS = SETTINGS.FPS
+        self.__FILEPATH = SETTINGS.FOLDER
+        self.__timer = 0
+        if selectedmap == "New" or selectedmap == "":
+            self.__new = True
+            self.__selected_map = "New"
+        else:
+            self.__new = False
+            self.__selected_map = selectedmap
+
+    def __loadfile(self):
+        '''Create new map file or open old'''
+        if self.__new == True:
+            self.__mapdata = self.__emptylist()
+        else:
+            self.__mapdata = np.load(ld.completepath(self.__FILEPATH,"maps",self.__selected_map+".npy"))
+            self.__wall_finder()
+            self.__item_finder()
+
+    def __rec_wallfollow(self, array, usedpointer, f_pointer_x, f_pointer_y, n = 1):
+        '''Don't assign color or n. Color will be  n only for iteration purpose'''
+        n += 1
+        flag = False
+        f_maneuver_x_col = [0, 1, 1, 1, 0,-1,-1,-1]
+        f_maneuver_y_row = [-1,-1, 0, 1, 1, 1, 0,-1]
+        for j in (usedpointer, usedpointer -1, usedpointer + 1, usedpointer -2, usedpointer +2):
+            j %= 8
+            f_pointer_x += f_maneuver_x_col[j]
+            f_pointer_y += f_maneuver_y_row[j]
+            try:
+                value = array[f_pointer_y, f_pointer_x]
+            except Exception as e:
+                print(f"Index Error Lv{n} Pointer {j}  Where {f_maneuver_x_col[j]},{f_maneuver_y_row[j]}  Complete {f_pointer_x},{f_pointer_y}")
+                print(f"Current Error {e}\n")
+            else:
+                if value == self.__value_dict["säule"]:
+                    ''' Säule gefunden, Ende'''
+                    flag = True
+                    break
+                elif value != 0:
+                    ''' Wand gefunden, Rekursion '''
+                    break
+                else:
+                    ''' Nichts gefunden, Schritt zurück '''
+                    f_pointer_x -= f_maneuver_x_col[j]
+                    f_pointer_y -= f_maneuver_y_row[j]
+        if flag:
+            return f_pointer_x, f_pointer_y
+        else:
+            return self.__rec_wallfollow(array, j, f_pointer_x, f_pointer_y, n)
+
+    def __rec_doubleremove(self, array, n = 0):
+        '''Don't assign n. n only for iteration purpose'''
+        array = np.unique(array, axis = 0)
+        if n == len(array):
+            return array
+        else:
+            delete = []
+            for i in range(len(array)):
+                if np.array_equal(array[n,0:2], array[i,2:4]) and \
+                   np.array_equal(array[n,2:4], array[i,0:2]):
+                    delete.append(i)
+            array = np.delete(array, tuple(delete), axis=0)
+            n+=1
+            return self.__rec_doubleremove(array, n)
+
+    def __wall_finder(self):
+        '''Search in maparray for existing walls and uses wallfollower to rebuild entire map.'''
+        saulentupple = np.where(self.__mapdata == 2)
+        saule_y, saule_x = saulentupple
+        maneuver_x_col = [0, 1, 1, 1, 0, -1, -1, -1]
+        maneuver_y_row = [-1, -1, 0, 1, 1, 1, 0, -1]
+        all_unfiltered_walls = np.empty((0,5),int)
+        for i in range(len(saule_x)):
+            saule_a_pos = [saule_x[i], saule_y[i]]
+            saule_b_pos_color = []
+            for j in range(len(maneuver_x_col)):
+                pointer_x = saule_x[i] + maneuver_x_col[j]
+                pointer_y = saule_y[i] + maneuver_y_row[j]
+                try:
+                    value = self.__mapdata[pointer_y, pointer_x]
+                except Exception as e:
+                    print(f"Index Error Lv{n} Pointer {j}  Where {f_maneuver_x_col[j]},{f_maneuver_y_row[j]}  Complete {f_pointer_x},{f_pointer_y}")
+                    print(f"Current Error {e}\n")
+                else:
+                    if value == self.__value_dict["säule"]:
+                        ''' Säule gefunden '''
+                        saule_b_pos_color.append([pointer_x, pointer_y, color])
+                    elif value != 0:
+                        ''' Wand in Farbcode value, Rekursion '''
+                        color = value
+                        pointer_x, pointer_y = self.__rec_wallfollow(self.__mapdata, j, pointer_x, pointer_y)
+                        saule_b_pos_color.append([pointer_x, pointer_y, color])
+            unfiltered_walls = np.empty((0,5),int)
+            ''' Erstelle vollständigen Array aus Säule_A_Pos und Säule_B_Pos '''
+            for b in saule_b_pos_color:
+                temp = []
+                temp.extend(saule_a_pos)
+                temp.extend(b)
+                unfiltered_walls = np.vstack([unfiltered_walls, np.array(temp)])
+            all_unfiltered_walls = np.vstack([all_unfiltered_walls, unfiltered_walls])
+        self.__all_walls = self.__rec_doubleremove(all_unfiltered_walls)
+
+    def __item_finder(self):
+        '''Search in maparray for existing items.'''
+        self.__spawn == False
+        itemtupple = np.where(self.__mapdata >= 50)
+        item_y, item_x = itemtupple
+        all_items = np.empty((0,3),int)
+        temp=[]
+        for i in range(len(item_x)):
+            value = self.__mapdata[pointer_y, pointer_x]
+            temp.extend([item_x[i], item_y[i]])
+            temp.extend(self.__mapdata[item_y[i],item_x[i]])
+            if value == self.__value_dict["spawn"]: self.__spawn==True
+            all_items = np.vstack([all_items,np.array(temp)])
+        self.__all_items = np.unique(all_items, axis = 0)
+
+    def __emptylist(self):
+        '''Create empty list'''
+        gridsize = 10
+        square = int(int(self.__HEIGHT / 100) * 100 / gridsize)
+        array = np.zeros((square, square), dtype=int)
+        array[[0,-1],:] = 4
+        array[:,[0,-1]] = 4
+        return array
+
+    def __save_data(self, mapname):
+        '''Saves walls into dataframe'''
+        self.__mapdata = self.__emptylist()
+        for wall in self.__wall_sprites:
+            indexing = wall.iterate_wall()
+            for i in range(len(indexing)):
+                x, y = indexing[i]
+                if i == 0: 
+                    value = 2
+                elif i == len(indexing)-1: 
+                    value = 2
+                else: value = 1
+                self.__mapdata[y][x] = value
+        for item in self.__item_sprites:
+            x,y = item.pos
+            x = int(x/10)
+            y = int(y/10)
+            self.__mapdata[y][x] = item.value
+        np.save(ld.completepath(self.__FILEPATH,"maps",mapname+".npy"),self.__mapdata)
+
+    def __drawGrid(self, surface):
+        '''Create surface grid'''
+        gridsize = 10
+        square = int(self.__HEIGHT / 100) * 100
+        background_rect = pygame.Rect(0, 0, square, square)
+        pygame.draw.rect(surface, (0,0,0), background_rect)
+        for x in range(int(square / gridsize)):
+            for y in range(int(square / gridsize)):
+                rect = pygame.Rect(x * gridsize, y * gridsize, gridsize, gridsize)
+                pygame.draw.rect(surface, (105,105,105), rect, 1)
+
+    def __line_draw(self,surface):
+        '''Draws temporary wall'''
+        mouse_pos = pygame.mouse.get_pos()
+        ende = tuple(map(lambda a: int(a / 10) * 10, mouse_pos))
+        pygame.draw.line(surface, (255,255,255), self.start, ende, 2)
+        wall = Wall(self.start)
+        wall.update(surface)
+
+    def __on_mouse_up(self):
+        '''Draws permament wall'''
+        self.__newline = True
+        mouse_pos = pygame.mouse.get_pos()
+        ende = tuple(map(lambda a: int(a / 10) * 10, mouse_pos))
+        wall = Wall(self.start, ende)
+        self.__wall_sprites.add(wall)
+
+    def Main(self):
+        ''' Inintialize '''
+        clock = pygame.time.Clock()
+        start_ticks = pygame.time.get_ticks()
+        screen = pygame.display.get_surface()
+        flag = False
+        self.__newline = True
+        self.__loadfile()
+        size = len(self.__mapdata) * 10
+        square = int(self.__HEIGHT / 100) * 100
+        ''' Sprites - Items '''
+        self.__item_sprites = pygame.sprite.Group()
+        ''' Sprites - Wall '''
+        self.__wall_sprites = pygame.sprite.Group()
+        if self.__new:
+            self.__textinput = TextField(square+50,20,70,30)
+            self.__spawn = False
+        else:
+            mapname = Text(square + 50,20,self.__selected_map,30)
+            for wall in self.__all_walls:
+                existing_wall = Wall((wall[0]*10,wall[1]*10),(wall[2]*10,wall[3]*10))
+                self.__wall_sprites.add(existing_wall)
+            for item in self.__all_items:
+                if item[2]==self.__value_dict["spawn"]:
+                    existing_item = Item("spawn",(item[0]*10,item[1]*10),self.__value_dict["spawn"])
+        ''' Sprites - UI '''
+        if self.__spawn == False:
+            warning = Text(square + 50,500,"Insert Spawn Point. Else no saving possible.",30)
+        objecttype = ToggleMenu(square + 50, 50, ["Spawn", "Wall Standard", "Health", "Armour", "Enemy", "Remove"])
+        savebutton = Button(square + 50 + 100, self.__HEIGHT - 100, "savedeaktiviert", "saveaktiviert")
+        ''' Gameloop '''
+        while True:
+            clock.tick(self.__FPS)
+            screen.fill((128,128,128))
+            mouse_pos = pygame.mouse.get_pos()
+            if mouse_pos[0] <= size and mouse_pos[1] <= size:
+                on_grid = True
+            else:
+                on_grid = False
+            savebutton.collision()
+            ''' Events '''
+            events = pygame.event.get()
+            for event in events:
+                if event.type == pygame.MOUSEBUTTONDOWN and on_grid == True: 
+                    ''' Klick auf Grid '''
+                    drawingtool = objecttype.active_value
+                    position = tuple(map(lambda a: int(a / 10) * 10, pygame.mouse.get_pos()))
+                    if drawingtool == "Spawn" and self.__spawn == False:
+                        self.__spawn = True
+                        spawnpoint = Item("spawn",99,position)
+                        self.__item_sprites.add(spawnpoint)
+                    elif drawingtool == "Wall Standard":
+                        self.__newline = False
+                        self.start = position
+                    elif drawingtool == "":
+                        pass
+                elif event.type == pygame.MOUSEBUTTONDOWN and on_grid == False:
+                    ''' Klick auf Tools '''
+                    if self.__new:
+                        ''' MapName anlegen '''
+                        self.__textinput.on_mouse_down()
+                    ''' Werkzeugauswahl '''
+                    objecttype.on_mouse_down()
+                    if savebutton.is_touched and self.__spawn: 
+                        ''' Speichern '''
+                        flag = True
+                        if self.__new==True:
+                            self.__textinput.update(events,screen)
+                            if self.__textinput.textvalue=="":
+                                self.__save_data("default")
+                            else:
+                                self.__save_data(self.__textinput.textvalue)
+                        else:
+                            self.__save_data(self.__selected_map)
+                elif event.type == pygame.MOUSEBUTTONUP and self.__newline == False and on_grid == True:
+                    ''' MausRelease wenn Wand gezeichnet wird '''
+                    self.__on_mouse_up()                    
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    flag = True
+                elif event.type == pygame.QUIT:
+                    flag = True
+            ''' Update '''
+            if self.__new:
+                self.__textinput.update(events, screen)
+            else:
+                mapname.render_text(screen)
+            if self.__spawn==False:
+                warning.render_text(screen)
+            objecttype.update(screen)
+            savebutton.collision()
+            savebutton.draw(screen)
+            self.__drawGrid(screen)
+            self.__item_sprites.update(screen)
+            self.__wall_sprites.update(screen)
+            if self.__newline == False:
+                self.__line_draw(screen)
+            if flag == True: break
+            pygame.display.flip()

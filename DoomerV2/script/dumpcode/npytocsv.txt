@@ -1,0 +1,7 @@
+import os
+import script.general.loader as ld
+import numpy as np
+
+folder = os.path.dirname(__file__)
+array = np.load(ld.completepath(folder,"maps","map1.npy"))
+np.savetxt("test.csv", array, delimiter=",")

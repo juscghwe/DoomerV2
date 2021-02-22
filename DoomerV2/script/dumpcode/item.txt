@@ -1,0 +1,20 @@
+import pygame
+import numpy as np
+import script.general.loader as ld
+from SETTINGS import SETTINGS
+
+class Item(pygame.sprite.Sprite):
+    def __init__(self, type_as_str, arrayvalue_as_int, midpos_as_tupple):
+        """Type = ImgName, arrayvalue = Value to save in Maparray"""
+        pygame.sprite.Sprite.__init__(self)
+        self.value = arrayvalue_as_int
+        self.pos = midpos_as_tupple
+        self.__img = ld.loadimage(SETTINGS.FOLDER, "images/mapeditor", type_as_str + ".png")
+        self.__rect = self.__img.get_rect()
+        self.__size = self.__img.get_size()
+
+    def __left(self, pos_tuple):
+        return tuple(map(lambda a, b: a - b / 2, pos_tuple, self.__size))
+
+    def update(self,target_surface):
+        target_surface.blit(self.__img, self.__left(self.pos))

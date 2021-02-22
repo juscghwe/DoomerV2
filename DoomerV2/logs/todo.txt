@@ -1,0 +1,12 @@
+ToDo
+
+- DONE: Texturen
+- DONE: Positionen anpassen auf MITTE der Squares
+- DONE: Items
+- DONE: Despawn (Press 'e')
+- DONE: Preview im MapEditor
+- Boxen anpassen an höhe wenn zu nah (--> vermeidet evtl Bug) / DONE: Wände identisch anpassen
+- Gegnerangriff
+- Gegnerbewegung
+- Gegnersicht (rotierte Gegner)
+- Player und Enemy StartDirection im MapEditor einstellen

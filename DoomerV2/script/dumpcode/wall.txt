@@ -1,0 +1,61 @@
+import pygame
+import numpy as np
+import script.general.loader as ld
+from operator import sub
+from SETTINGS import SETTINGS
+
+class Wall(pygame.sprite.Sprite):
+    def __init__(self, a_pos, b_pos=()):
+        pygame.sprite.Sprite.__init__(self)
+        self.__cross_img = ld.loadimage(SETTINGS.FOLDER, "images/mapeditor", "wallcross.png")
+        self.__rect = self.__cross_img.get_rect()
+        self.__size = self.__cross_img.get_size()
+        self.__a_pos = a_pos
+        if not b_pos:   self.__b_pos = False
+        else:           self.__b_pos = b_pos
+
+    def __left(self, pos_tuple):
+        """Gibt linke Position des Wandicon Rects zurück"""
+        result = tuple(map(lambda a, b: a - b / 2, pos_tuple, self.__size))
+        return result
+
+    def iterate_wall(self):
+        """Gibt einen array aller x/y Werte einer Wand zurück."""
+        a_pos = tuple(map(lambda a: int(a / 10), self.__a_pos))
+        b_pos = tuple(map(lambda a: int(a / 10), self.__b_pos))
+        delta_x, delta_y = map(sub, b_pos, a_pos)
+        ascension = None
+        if delta_x != 0: ascension = delta_y / delta_x
+        if abs(delta_x) == delta_x: dir_x = 1
+        else: dir_x = -1
+        if ascension == None:
+            # vertikal
+            if abs(delta_y) == delta_y: dir_y = 1
+            else: dir_y = -1
+            x_it = (a_pos[0]     for x in range(0, delta_y + dir_y, dir_y))
+            y_it = (a_pos[1] + y for y in range(0, delta_y + dir_y, dir_y))
+        elif ascension == 0:
+            # horizontal
+            x_it = (a_pos[0] + x for x in range(0, delta_x + dir_x, dir_x))
+            y_it = (a_pos[1]     for y in range(0, delta_x + dir_x, dir_x))
+        else:
+            # andere Winkel
+            x_it = (a_pos[0] + x    
+                    for x in range(0, delta_x + dir_x, dir_x))
+            y_it = (round(a_pos[1] + x * ascension, 0)
+                    for x in range(0, delta_x + dir_x, dir_x))
+        x_array = np.fromiter(x_it, int)
+        y_array = np.fromiter(y_it, int)
+        array = np.vstack((x_array, y_array))
+        return array.transpose()
+
+    def update(self,target_surface):
+        if self.__b_pos == False:
+            self.__a_left = self.__left(self.__a_pos)
+            target_surface.blit(self.__cross_img, self.__a_left)
+        else:
+            self.__a_left = self.__left(self.__a_pos)
+            self.__b_left = self.__left(self.__b_pos)
+            pygame.draw.line(target_surface, (255,255,255), self.__a_pos, self.__b_pos, 2)
+            target_surface.blit(self.__cross_img, self.__a_left)
+            target_surface.blit(self.__cross_img, self.__b_left)

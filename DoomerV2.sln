@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "DoomerV2", "DoomerV2\DoomerV2.pyproj", "{EAEB1ED7-4AA7-485A-93E6-19848C500745}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EAEB1ED7-4AA7-485A-93E6-19848C500745}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAEB1ED7-4AA7-485A-93E6-19848C500745}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {45059984-7CE9-471B-BF49-2E58C7C5838B}
+	EndGlobalSection
+EndGlobal
