@@ -129,7 +129,7 @@ class Enemy(pygame.sprite.Sprite):
                 # Anders rum wahrscheinlich identisch
                 screen.blit(image, (self.__draw_start_x + left, self.__draw_start_y), (left, 0, self.width, self.__sprite_height))
 
-    def npc(self, player_object, true_fps):
+    def fire(self, player_object, true_fps):
         projectil = None
         if true_fps == 0: true_fps = SETTINGS.FPS
         self.__shoottime = int(SETTINGS.ENEMY_SHOOT_TIME * true_fps)

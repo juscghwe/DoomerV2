@@ -133,17 +133,22 @@ class GameLoop(object):
             ''' NPCs and Items, Weapon, Player, ... '''
             enemies_items.update(player.pos, player.dir, player.plane, camera.WallDistBuffer)
             for item in items:
+                ''' Pickups '''
                 player, weapon = item.pickup(player, weapon)
             for enemy in enemies:
                 if enemy.health > 0: 
-                    projectil = enemy.npc(player, fps)
+                    ''' Gegnerbewegung'''
+                    ''' Gegnerschuss '''
+                    projectil = enemy.fire(player, fps)
                     if projectil is not None:
                         fireballs.add(projectil, layer = lay)
                         enemies_items.add(projectil, layer = lay)
                         lay += 1
             for fireball in fireballs:
+                ''' Feuerbälle '''
                 player = fireball.attack(player)
             for sprite in sorted(enemies_items, key=lambda spr: spr.dist, reverse=True):
+                ''' Zeichnen '''
                 sprite.render(fps)
                 if sprite.dead:
                     sprite.kill()
