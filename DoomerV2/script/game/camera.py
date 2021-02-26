@@ -69,7 +69,6 @@ class Camera(object):
 
     def update(self, player_pos, player_dir, player_plane):
         walls = []
-        floor = []
         self.WallDistBuffer = [None] * self.__DISPLAY_WIDTH
         w = self.__DISPLAY_WIDTH
         h = self.__DISPLAY_HEIGHT
@@ -78,33 +77,6 @@ class Camera(object):
         plane_x, plane_y = player_plane
         tex_width = self.__TEX_WIDTH
         tex_height = self.__TEX_HEIGHT
-        #x = 0
-        #y = 0
-        #''' Floor Casting '''
-        #for y in range(h):
-        #    ''' Äußerst rechter und linker Ray '''
-        #    ray_dir_x0 = x_dir - plane_x
-        #    ray_dir_y0 = y_dir - plane_y
-        #    ray_dir_x1 = x_dir + plane_x
-        #    ray_dir_y1 = y_dir + plane_y
-        #    ''' y-Position im Verhältnis zum Horizont '''
-        #    p = int(y - h / 2)
-        #    ''' Vertikale Kameraposition'''
-        #    z_pos = 0.5 * h
-        #    row_dist = z_pos / p
-        #    floor_step_x = row_dist * (ray_dir_x1 - ray_dir_x0) / w
-        #    floor_step_y = row_dist * (ray_dir_y1 - ray_dir_y0) / w
-        #    floor_x = pos_x + row_dist * ray_dir_x0
-        #    floor_y = pos_y + row_dist * ray_dir_y0
-        #    for x in range(w):
-        #        cell_x = int(floor_x)
-        #        cell_y = int(floor_y)
-        #        ''' Texturkoordinaten '''
-        #        tx = int(tex_width*(floor_x - cell_x))
-        #        ty = int(tex_height*(floor_y - cell_y))
-        #        floor_x += floor_step_x
-        #        floor_y += floor_step_y
-        #        floor.append([ty, (x, draw_start), (x, draw_end), tex_pos])
 
         ''' Wall Casting '''
         x = 0
@@ -117,6 +89,7 @@ class Camera(object):
 
             ''' Mapposition auf Box '''
             map_x, map_y = int(x_pos), int(y_pos)
+            tex_num = self.map[map_x][map_y]
 
             ''' Ray-Länge in x/y-Richtung '''
             if ray_dir_x != 0:  delta_dist_x = abs(1 / ray_dir_x)
@@ -149,7 +122,7 @@ class Camera(object):
                     side_dist_y += delta_dist_y
                     map_y += step_y
                     side = 1
-                if self.map[map_x][map_y] > 0 and self.map[map_x][map_y] < 50:
+                if 0 < tex_num < 50:
                     hit = 1
 
             ''' Abstand von geradem Ray '''
@@ -170,15 +143,7 @@ class Camera(object):
             draw_end = line_height / 2 + h / 2
             if draw_end >= h: draw_end = h - 1
 
-            #''' Farbe bestimmen '''
-            #if self.map[map_x][map_y] == 1: color = self.__RGB_RED
-            #elif self.map[map_x][map_y] == 2: color = self.__RGB_GREEN
-            #elif self.map[map_x][map_y] == 3: color = self.__RGB_BLUE
-            #elif self.map[map_x][map_y] == 4: color = self.__RGB_WHITE
-            #elif self.map[map_x][map_y] == 5: color = self.__RGB_YELLOW
-            #if side == 1: color = tuple(int(i / 2) for i in color)
             ''' Texturstreifen bestimmen '''
-            tex_num = self.map[map_x][map_y]
             if side == 0:
                 wall_x = y_pos + perp_wall_dist * ray_dir_y
             else:

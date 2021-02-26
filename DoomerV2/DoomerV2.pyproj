@@ -812,6 +812,7 @@
     <Content Include="logs\arrayvalues.txt" />
     <Content Include="logs\test.csv" />
     <Content Include="logs\todo.txt" />
+    <Content Include="maps\map1.npy" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
