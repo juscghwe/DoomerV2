@@ -68,6 +68,11 @@ class Camera(object):
         return max(min(maxn, n), minn)
 
     def update(self, player_pos, player_dir, player_plane):
+        # Änderungen:
+        # - Sichtlinie im Bereich Sichtweite anlegen (linspace nutzen, step = Sichtweite --> siehe Enemy)
+        # - ersten Treffer Typ Wall ausgeben, umrechnen
+        # spart Zwischeniteration
+
         walls = []
         self.WallDistBuffer = [None] * self.__DISPLAY_WIDTH
         w, h = self.__DISPLAY_WIDTH, self.__DISPLAY_HEIGHT

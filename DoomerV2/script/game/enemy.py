@@ -44,6 +44,7 @@ class Enemy(pygame.sprite.Sprite):
         self.__death_img = ld.loadimage(SETTINGS.FOLDER, "images/gameobjects","enemydeath.png")
         self.__DISPLAY_WIDTH, self.__DISPLAY_HEIGHT = SETTINGS.SIZE
         self.__maparray = maparray
+        self.__maparray_fine = np.kron(maparray, np.ones((10,10)))
         self.__img = self.__still_img
         self.__rect = self.__img.get_rect()
         self.__rect.center = (self.pos_x, self.pos_y)
@@ -166,8 +167,8 @@ class Enemy(pygame.sprite.Sprite):
         x = abs(player_x - self.pos_x)
         y = abs(player_y - self.pos_y)
         ''' Sichtlinie anlegen '''
-        if x > y: space = int(x/2)
-        else: space = int(y/2)
+        if x > y: space = int(x / 2)
+        else: space = int(y / 2)
         x_vector = np.linspace(self.pos_x, player_x, space)
         y_vector = np.linspace(self.pos_y, player_y, space)
         values = self.__maparray[x_vector.astype(np.int), y_vector.astype(np.int)]

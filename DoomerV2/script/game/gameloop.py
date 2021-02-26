@@ -65,13 +65,6 @@ class GameLoop(object):
             despawn_y = despawn_y + 0.5
         except Exception as e:
             print("DespawnPoint Error: ", e)
-        else:
-            item_array = self.__item_loader(SETTINGS.MAPITEMS["despawn"])
-            for i in item_array:
-                item = Item(tuple(i),SETTINGS.MAPITEMS["despawn"], 1, 0)
-                items.add(item, layer = lay)
-                enemies_items.add(item, layer=lay)
-                lay+=1     
         ''' Sprites - Enemy '''
         enemies_items = pygame.sprite.LayeredUpdates()
         enemies = pygame.sprite.LayeredUpdates()
@@ -85,7 +78,7 @@ class GameLoop(object):
         fireballs = pygame.sprite.LayeredUpdates()
         ''' Sprites - Items '''
         items = pygame.sprite.LayeredUpdates()
-        items_dict = {name:val for name,val in SETTINGS.MAPITEMS.items() if 50 <= val < 97}
+        items_dict = {name:val for name,val in SETTINGS.MAPITEMS.items() if 50 <= val < 97 or val == 98}
         items_list = list(items_dict.keys())
         for item_name in items_list:
             item_array = self.__item_loader(SETTINGS.MAPITEMS[item_name])

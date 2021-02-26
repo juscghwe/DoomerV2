@@ -13,6 +13,7 @@ class Projectile(pygame.sprite.Sprite):
         self.__rect.center = (self.pos_x, self.pos_y)
         self.__sprite_width, self.__sprite_height = 64, 64
         self.__maparray = maparray
+        self.__maparray_fine = np.kron(maparray, np.ones((10,10)))
         self.__dir = self.__normalize(pos_tupple, player_pos)
         self.__DISPLAY_WIDTH, self.__DISPLAY_HEIGHT = SETTINGS.SIZE
         self.__movement_speed = SETTINGS.PROJECTILE_SPEED
