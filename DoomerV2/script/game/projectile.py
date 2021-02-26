@@ -15,7 +15,7 @@ class Projectile(pygame.sprite.Sprite):
         self.__maparray = maparray
         self.__dir = self.__normalize(pos_tupple, player_pos)
         self.__DISPLAY_WIDTH, self.__DISPLAY_HEIGHT = SETTINGS.SIZE
-        self.__movement_speed = 1
+        self.__movement_speed = SETTINGS.PROJECTILE_SPEED
         self.__time = 0
         self.dead = False
         self.visible = False
