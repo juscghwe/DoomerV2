@@ -37,6 +37,8 @@ class GameLoop(object):
     def Main(self):
         ''' Inintialize '''
         pygame.mouse.set_visible(False)
+        pygame.mouse.set_pos = (self.__WIDTH/2, self.__HEIGHT/2)
+        pygame.event.set_grab(True)
         clock = pygame.time.Clock()
         start_ticks = pygame.time.get_ticks()
         screen = pygame.display.get_surface()
@@ -155,3 +157,4 @@ class GameLoop(object):
                 despawn = False
             pygame.display.flip()
         pygame.mouse.set_visible(True)
+        pygame.event.set_grab(False)
