@@ -32,6 +32,9 @@
     <Compile Include="script\game\enemy.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="script\game\projectile.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="script\game\item.py">
       <SubType>Code</SubType>
     </Compile>

@@ -10,6 +10,7 @@ from script.game.camera import Camera
 from script.game.weapon import Weapon
 from script.game.player import Player
 from script.game.enemy import Enemy
+from script.game.projectile import Projectile
 from script.game.item import Item
 from script.general.text import Text
 
@@ -69,10 +70,11 @@ class GameLoop(object):
         enemie_array = self.__item_loader(SETTINGS.MAPITEMS["enemy"])
         lay = 1
         for i in enemie_array:
-            enemy = Enemy(tuple(i))
+            enemy = Enemy(tuple(i), self.__maparray)
             enemies.add(enemy, layer = lay)
             enemies_items.add(enemy, layer=lay)
             lay+=1
+        fireballs = pygame.sprite.LayeredUpdates()
         ''' Sprites - Items '''
         items = pygame.sprite.LayeredUpdates()
         item_array = self.__item_loader(SETTINGS.MAPITEMS["despawn"])
@@ -133,7 +135,14 @@ class GameLoop(object):
             for item in items:
                 player, weapon = item.pickup(player, weapon)
             for enemy in enemies:
-                if enemy.health > 0: player = enemy.npc(player, fps)
+                if enemy.health > 0: 
+                    projectil = enemy.npc(player, fps)
+                    if projectil is not None:
+                        fireballs.add(projectil, layer = lay)
+                        enemies_items.add(projectil, layer = lay)
+                        lay += 1
+            for fireball in fireballs:
+                player = fireball.attack(player)
             for sprite in sorted(enemies_items, key=lambda spr: spr.dist, reverse=True):
                 sprite.render(fps)
                 if sprite.dead:

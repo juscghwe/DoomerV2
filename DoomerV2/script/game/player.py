@@ -60,16 +60,16 @@ class Player(object):
         
         if pygame.key.get_pressed()[pygame.K_UP] or pygame.key.get_pressed()[pygame.K_w]: 
             ''' Vor '''
-            col_x = self.__map[int(self.x_pos + self.x_dir * move_speed)][int(self.y_pos)]
-            col_y = self.__map[int(self.x_pos)][int(self.y_pos + self.y_dir * move_speed)]
+            col_x = self.__map[int(self.x_pos + self.x_dir * move_speed), int(self.y_pos)]
+            col_y = self.__map[int(self.x_pos), int(self.y_pos + self.y_dir * move_speed)]
             if col_x == 0 or col_x > 50:
                 self.x_pos = self.x_pos + self.x_dir * move_speed
             if col_y == 0 or col_y > 50:
                 self.y_pos = self.y_pos + self.y_dir * move_speed
         if pygame.key.get_pressed()[pygame.K_DOWN] or pygame.key.get_pressed()[pygame.K_s]: 
             ''' Zurück '''
-            col_x = self.__map[int(self.x_pos - self.x_dir * move_speed)][int(self.y_pos)]
-            col_y = self.__map[int(self.x_pos)][int(self.y_pos - self.y_dir * move_speed)]
+            col_x = self.__map[int(self.x_pos - self.x_dir * move_speed), int(self.y_pos)]
+            col_y = self.__map[int(self.x_pos), int(self.y_pos - self.y_dir * move_speed)]
             if col_x == 0 or col_x > 50:
                 self.x_pos = self.x_pos - self.x_dir * move_speed
             if col_y == 0 or col_y > 50:
@@ -78,8 +78,8 @@ class Player(object):
             ''' Links '''
             old_rotation = (self.x_dir, self.y_dir)
             self.__rotate(1)
-            col_x = self.__map[int(self.x_pos + self.x_dir * straf_speed)][int(self.y_pos)]
-            col_y = self.__map[int(self.x_pos)][int(self.y_pos + self.y_dir * straf_speed)]
+            col_x = self.__map[int(self.x_pos + self.x_dir * straf_speed), int(self.y_pos)]
+            col_y = self.__map[int(self.x_pos), int(self.y_pos + self.y_dir * straf_speed)]
             if col_x == 0 or col_x > 50:
                 self.x_pos = self.x_pos + self.x_dir * straf_speed
             if col_y == 0 or col_y > 50:
@@ -89,8 +89,8 @@ class Player(object):
             ''' Rechts '''
             old_rotation = (self.x_dir, self.y_dir)
             self.__rotate(-1)
-            col_x = self.__map[int(self.x_pos + self.x_dir * straf_speed)][int(self.y_pos)]
-            col_y = self.__map[int(self.x_pos)][int(self.y_pos + self.y_dir * straf_speed)]
+            col_x = self.__map[int(self.x_pos + self.x_dir * straf_speed), int(self.y_pos)]
+            col_y = self.__map[int(self.x_pos), int(self.y_pos + self.y_dir * straf_speed)]
             if col_x == 0 or col_x > 50:
                 self.x_pos = self.x_pos + self.x_dir * straf_speed
             if col_y == 0 or col_y > 50:

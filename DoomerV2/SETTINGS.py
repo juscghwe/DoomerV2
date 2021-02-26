@@ -42,6 +42,10 @@ class SETTINGS:
     ENEMY_SHOOT_TIME = 1
     ENEMY_COOLDOWN_TIME = 1
 
+    '''Projectil'''
+    PROJECTILE_DURATION = 50
+    PROJECTILE_MAX_DIST = 0.3
+
     '''Item'''
     HEALTH_PICKUP = 20
     ARMOR_PICKUP = 30
