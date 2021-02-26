@@ -54,6 +54,7 @@ class Enemy(pygame.sprite.Sprite):
         self.dead = False
         self.__shooting = False
         self.__shoot_timer = 0
+        self.__test_array_values = np.arange(0, 50)
 
     def update(self,player_pos_tupple, player_dir_tupple, plane_tupple, dist_buffer):
         self.__attrs=(player_pos_tupple, player_dir_tupple, plane_tupple, dist_buffer)
@@ -135,10 +136,11 @@ class Enemy(pygame.sprite.Sprite):
         self.__shoottime = int(SETTINGS.ENEMY_SHOOT_TIME * true_fps)
         self.__cooldowntime = int(SETTINGS.ENEMY_COOLDOWN_TIME * true_fps)
         timer = self.__shoottime / 3
-        if math.sqrt(self.dist) <= 3 and self.__shoot_timer == 0 and self.visible:
+        seeing = self.line_of_sight(player_object.pos)
+        if math.sqrt(self.dist) <= SETTINGS.ENEMY_VIEW_DIST and self.__shoot_timer == 0 and seeing:
             self.__shoot_timer = 1
         if self.__shoot_timer >= 1:
-            # Schussanimation
+            ''' Schussanimation '''
             if self.__shoot_timer <= timer:
                 self.__shooting == True
                 self.__img = self.__shot_img1
@@ -146,18 +148,29 @@ class Enemy(pygame.sprite.Sprite):
                 self.__img = self.__shot_img2
             elif timer * 2 < self.__shoot_timer < timer * 3:
                 self.__img = self.__shot_img3
-            elif self.__shoot_timer == timer * 3:
-                # Projektil anlegen
+            elif self.__shoot_timer == timer * 3 and math.sqrt(self.dist) <= SETTINGS.ENEMY_VIEW_DIST:
+                ''' Projektil anlegen '''
                 projectil = Projectile(self.pos, player_object.pos, self.dist, self.__maparray)
             elif self.__shoottime < self.__shoot_timer <= self.__shoottime + self.__cooldowntime:
-                # Cooldown
+                ''' Cooldown '''
                 self.__img = self.__still_img
             elif self.__shoottime + self.__cooldowntime < self.__shoot_timer:
-                # Prepare
+                ''' Prepare '''
                 self.__shoot_timer = 0
-
-            #if self.__shoottime < self.__shoot_timer:
-            #    self.projectile.draw(*self.__attrs)
-            #    player_object = projectile.update(player_object)
             self.__shoot_timer += 1
         return projectil
+
+    def line_of_sight(self, player_obj_pos):
+        ''' Returns bool True if seeing'''
+        player_x, player_y = player_obj_pos
+        x = abs(player_x - self.pos_x)
+        y = abs(player_y - self.pos_y)
+        ''' Sichtlinie anlegen '''
+        if x > y: space = int(x/2)
+        else: space = int(y/2)
+        x_vector = np.linspace(self.pos_x, player_x, space)
+        y_vector = np.linspace(self.pos_y, player_y, space)
+        values = self.__maparray[x_vector.astype(np.int), y_vector.astype(np.int)]
+        ''' Sichtlinie auswerten '''
+        seeing = not np.any(np.isin(values, self.__test_array_values) == True)
+        return seeing

@@ -65,6 +65,13 @@ class GameLoop(object):
             despawn_y = despawn_y + 0.5
         except Exception as e:
             print("DespawnPoint Error: ", e)
+        else:
+            item_array = self.__item_loader(SETTINGS.MAPITEMS["despawn"])
+            for i in item_array:
+                item = Item(tuple(i),SETTINGS.MAPITEMS["despawn"], 1, 0)
+                items.add(item, layer = lay)
+                enemies_items.add(item, layer=lay)
+                lay+=1     
         ''' Sprites - Enemy '''
         enemies_items = pygame.sprite.LayeredUpdates()
         enemies = pygame.sprite.LayeredUpdates()
@@ -87,31 +94,6 @@ class GameLoop(object):
                 items.add(item, layer = lay)
                 enemies_items.add(item, layer=lay)
                 lay+=1    
-
-        #item_array = self.__item_loader(SETTINGS.MAPITEMS["despawn"])
-        #for i in item_array:
-        #    item = Item(tuple(i),SETTINGS.MAPITEMS["despawn"], 1, 0)
-        #    items.add(item, layer = lay)
-        #    enemies_items.add(item, layer=lay)
-        #    lay+=1     
-        #item_array = self.__item_loader(SETTINGS.MAPITEMS["health"])
-        #for i in item_array:
-        #    item = Item(tuple(i),SETTINGS.MAPITEMS["health"], 3, 4)
-        #    items.add(item, layer = lay)
-        #    enemies_items.add(item, layer=lay)
-        #    lay+=1     
-        #item_array = self.__item_loader(SETTINGS.MAPITEMS["armour"])
-        #for i in item_array:
-        #    item = Item(tuple(i),SETTINGS.MAPITEMS["armour"], 3, 3)
-        #    items.add(item, layer = lay)
-        #    enemies_items.add(item, layer=lay)
-        #    lay+=1 
-        #item_array = self.__item_loader(SETTINGS.MAPITEMS["shotgunshell"])
-        #for i in item_array:
-        #    item = Item(tuple(i),SETTINGS.MAPITEMS["shotgunshell"], 3, 4)
-        #    items.add(item, layer = lay)
-        #    enemies_items.add(item, layer=lay)
-        #    lay+=1     
 
         ''' Gameloop '''
         while True:
