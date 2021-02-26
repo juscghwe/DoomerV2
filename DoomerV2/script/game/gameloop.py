@@ -147,7 +147,6 @@ class GameLoop(object):
             FPS_clock.text = str(fps)
             FPS_clock.render_text(screen)
             if flag == True or player.health <= 0:
-                print("LOST: ", player.health)
                 break
             if abs(player.x_pos - despawn_x) < 1 and abs(player.y_pos - despawn_y) < 1:
                 ''' Despawn erreicht '''

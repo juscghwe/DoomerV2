@@ -40,7 +40,6 @@ import time
 
 class Camera(object):
     def __init__(self, maparray):
-        #self.__SCREEN = pygame.display.get_surface()
         self.map = maparray
         self.__MAP_WIDTH = len(maparray)
         self.__MAP_HEIGHT = len(maparray[1])
@@ -56,6 +55,7 @@ class Camera(object):
         self.pretimings = []
         self.posttimings = []
         self.__texture = SETTINGS.MAPITEMS
+        self.__texture_inv = {val:name for name,val in SETTINGS.MAPITEMS.items()}
         ''' Texture Code '''
         self.textures = {
             self.__texture["wallbloodeye"]: [ld.loadimage(SETTINGS.FOLDER, "images/gameobjects/wallbloodeye", f"wallbloodeye{i}.png") for i in range(SETTINGS.TEX_WIDTH * 2)],
@@ -70,13 +70,11 @@ class Camera(object):
     def update(self, player_pos, player_dir, player_plane):
         walls = []
         self.WallDistBuffer = [None] * self.__DISPLAY_WIDTH
-        w = self.__DISPLAY_WIDTH
-        h = self.__DISPLAY_HEIGHT
+        w, h = self.__DISPLAY_WIDTH, self.__DISPLAY_HEIGHT
         x_pos, y_pos = player_pos
         x_dir, y_dir = player_dir
         plane_x, plane_y = player_plane
-        tex_width = self.__TEX_WIDTH
-        tex_height = self.__TEX_HEIGHT
+        tex_width, tex_height = self.__TEX_WIDTH, self.__TEX_HEIGHT
 
         ''' Wall Casting '''
         x = 0
@@ -89,8 +87,7 @@ class Camera(object):
 
             ''' Mapposition auf Box '''
             map_x, map_y = int(x_pos), int(y_pos)
-            tex_num = self.map[map_x][map_y]
-
+            
             ''' Ray-Länge in x/y-Richtung '''
             if ray_dir_x != 0:  delta_dist_x = abs(1 / ray_dir_x)
             else:               delta_dist_x = 0
@@ -110,7 +107,7 @@ class Camera(object):
             else:
                 step_y = 1
                 side_dist_y = (map_y + 1 - y_pos) * delta_dist_y
-
+            
             ''' DDA '''
             hit = 0
             while hit == 0:
@@ -122,9 +119,10 @@ class Camera(object):
                     side_dist_y += delta_dist_y
                     map_y += step_y
                     side = 1
+                tex_num = self.map[map_x,map_y]
                 if 0 < tex_num < 50:
                     hit = 1
-
+            
             ''' Abstand von geradem Ray '''
             if side == 0:
                 if ray_dir_x != 0: perp_wall_dist = (map_x - x_pos + (1 - step_x) / 2) / ray_dir_x
@@ -142,7 +140,7 @@ class Camera(object):
             if draw_start < 0: draw_start = 0
             draw_end = line_height / 2 + h / 2
             if draw_end >= h: draw_end = h - 1
-
+            
             ''' Texturstreifen bestimmen '''
             if side == 0:
                 wall_x = y_pos + perp_wall_dist * ray_dir_y
@@ -157,7 +155,6 @@ class Camera(object):
                 tex_x += self.__TEX_WIDTH       # shift to dark
             tex_pos = int((draw_start - h / 2 + line_height / 2) * perp_wall_dist * self.__TEX_HEIGHT / h)
             # tex_pos in wall_pos umrechnen um negativwert zu berechnen
-
             ''' Zeichenliste anlegen '''
             walls.append([tex_num, tex_x, (x, draw_start), (x, draw_end), tex_pos, line_height])
             self.WallDistBuffer[x] = perp_wall_dist
@@ -169,7 +166,7 @@ class Camera(object):
         screen = pygame.display.get_surface()
         for i in walls:
             value = i[0]
-            tex_name = list(self.__texture.keys())[list(self.__texture.values()).index(value)]
+            tex_name = self.__texture_inv[value]
             stripe = i[1]
             top = i[2]
             bottom = i[3]

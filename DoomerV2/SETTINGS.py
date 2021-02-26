@@ -7,7 +7,7 @@ class SETTINGS:
     FPS = 60
     SIZE = WIDTH, HEIGHT = (1024, 768)
     TITLE = "DOOMER"
-    FULLSCREEN = True
+    FULLSCREEN = False
     MOUSE_SENSITIVITY = 100
 
     '''Player'''
