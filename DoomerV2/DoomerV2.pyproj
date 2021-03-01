@@ -25,7 +25,7 @@
     <Compile Include="imagemanipulation.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="testdatei.py">
+    <Compile Include="tryoutarea.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="script\dumpcode\cameraold.txt" />
